@@ -11,7 +11,7 @@ Namespace com.vasilchenko
 
         End Function
 
-        <CommandMethod("LayoutsCreator", CommandFlags.Session)>
+        <CommandMethod("ASU_LayoutCreator", CommandFlags.Session)>
         Public Shared Sub Main()
             Dim swTimer = New Stopwatch
             swTimer.Start()
@@ -19,6 +19,8 @@ Namespace com.vasilchenko
             Dim strMessage As String = ""
 
             Application.AcadApplication.ActiveDocument.SendCommand("(command ""_-Purge"")(command ""_ALL"")(command ""*"")(command ""_N"")" & vbCr)
+            Application.AcadApplication.ActiveDocument.SendCommand("(command ""PSLTSCALE"")(command ""0"")" & vbCr)
+
             Dim ufStart As New ufStartForm
             Try
                 ufStart.ShowDialog()

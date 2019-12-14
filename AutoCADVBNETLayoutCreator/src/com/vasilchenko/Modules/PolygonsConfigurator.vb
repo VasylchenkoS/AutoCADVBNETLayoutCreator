@@ -12,6 +12,7 @@ Namespace com.vasilchenko.modules
         Dim acDatabase As Database
         Dim acEditor As Editor
         Dim acTransaction As Transaction
+
         Public Function GetAllLayers() As List(Of String)
             acDocument = Application.DocumentManager.MdiActiveDocument
             acDatabase = acDocument.Database
@@ -28,11 +29,12 @@ Namespace com.vasilchenko.modules
             End Using
             Return acLayersList
         End Function
+
         Public Sub CreateLayoutsList(strLayerName As String)
 
             Using docLock As DocumentLock = acDocument.LockDocument()
                 acTransaction = acDatabase.TransactionManager.StartTransaction()
-
+                                
                 Dim acTypedValue As TypedValue() = New TypedValue(0) {New TypedValue(DxfCode.LayerName, strLayerName)}
                 Dim acSelFilter As SelectionFilter = New SelectionFilter(acTypedValue)
                 Dim acPromSelResult As PromptSelectionResult = acEditor.SelectAll(acSelFilter)
@@ -106,20 +108,26 @@ Namespace com.vasilchenko.modules
         Private Function SortEntitysOnAxis(acPoligonList As List(Of PrintedPoligonClass)) As SortedList(Of Double, SortedList(Of Double, PrintedPoligonClass))
             Dim descendingComparer = Comparer(Of Double).Create(Function(x, y) y.CompareTo(x))
             Dim acSortedPoligonList As New SortedList(Of Double, SortedList(Of Double, PrintedPoligonClass))(descendingComparer)
-
-            For Each acItem In acPoligonList
-                Dim queryResult = From key In acSortedPoligonList.Keys
-                                  Where key > acItem.BottonLeft.Y - 25 And key < acItem.BottonLeft.Y + 25
-                                  Select key
-                If queryResult.Count = 0 Then
-                    Dim tempList = New SortedList(Of Double, PrintedPoligonClass)
-                    tempList.Add(acItem.BottonLeft.X, acItem)
-                    acSortedPoligonList.Add(acItem.BottonLeft.Y, tempList)
-                Else
-                    acSortedPoligonList.Item(queryResult(0)).Add(acItem.BottonLeft.X, acItem)
-                End If
-            Next
-
+            Try
+                For Each acItem In acPoligonList
+                    Dim queryResult = From key In acSortedPoligonList.Keys
+                                      Where key > acItem.BottonLeft.Y - 100 And key < acItem.BottonLeft.Y + 100
+                                      Select key
+                    If queryResult.Count = 0 Then
+                        Dim tempList = New SortedList(Of Double, PrintedPoligonClass)
+                        tempList.Add(acItem.BottonLeft.X, acItem)
+                        acSortedPoligonList.Add(acItem.BottonLeft.Y, tempList)
+                    Else
+                        If Not acSortedPoligonList.Item(queryResult(0)).ContainsKey(acItem.BottonLeft.X) Then
+                            acSortedPoligonList.Item(queryResult(0)).Add(acItem.BottonLeft.X, acItem)
+                        Else
+                            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("2 рамки в координате " & acItem.BottonLeft.X & ":" & acItem.BottonLeft.Y & "\n")
+                        End If
+                    End If
+                Next
+            Catch ex As Exception
+                MsgBox(ex.Message)
+            End Try
             Return acSortedPoligonList
         End Function
 

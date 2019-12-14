@@ -47,7 +47,7 @@ Namespace com.vasilchenko.modules
                     If blnTest Then
                         Dim acPrmtStrOptns As PromptStringOptions = New PromptStringOptions(vbCrLf & "Всё хорошо?" & vbCrLf _
                                                                                           & "Да(Д)/Yes(Y) - продолжаем печать" & vbCrLf _
-                                                                                          & "Нет(Н)/No(N) - выбрать правую нижнюю точку ПЕРВОЙ рамки для определения смещения" & vbCrLf _
+                                                                                          & "Нет(Н)/No(N) - выбрать левую нижнюю точку ПЕРВОЙ рамки для определения смещения" & vbCrLf _
                                                                                           & "Выход(В)/Exit(E) - Завершить выполение" & vbCrLf _
                                                                                           & "Choose your destiny")
 
@@ -84,6 +84,10 @@ Namespace com.vasilchenko.modules
             Dim strCanonicalName As String = SelectCanonicalName(curItem, acLayout.LayoutName, acEditor)
             Using acPlotStg As PlotSettings = New PlotSettings(acLayout.ModelType)
                 acPlotStg.CopyFrom(acLayout)
+
+                ' Specify if plot styles should be displayed on the layout
+                acPlotStg.ShowPlotStyles = True
+                acPlotStg.ScaleLineweights = False
 
                 Dim acPlotStgValidator As PlotSettingsValidator = PlotSettingsValidator.Current
 
@@ -129,10 +133,6 @@ Namespace com.vasilchenko.modules
                 ' (must be called before setting the plot style)
                 acPlotStgValidator.RefreshLists(acPlotStg)
 
-                ' Specify if plot styles should be displayed on the layout
-                acPlotStg.ShowPlotStyles = True
-                acPlotStg.ScaleLineweights = True
-
                 'Copy the PlotSettings data back to the Layout
                 Dim blnUpgraded = False
                 If Not acLayout.IsWriteEnabled Then
@@ -177,7 +177,7 @@ Namespace com.vasilchenko.modules
             For Each item As DBDictionaryEntry In lays
                 If item.Key <> "Model" AndAlso item.Key <> "TempLayout" Then
                     acLayoutMgr.DeleteLayout(item.Key)
-                    acEditor.WriteMessage("Лист " & item.Key & " удален")
+                    acEditor.WriteMessage("Лист " & item.Key & " удален" & "\n")
                 End If
             Next
         End Sub
@@ -190,13 +190,13 @@ Namespace com.vasilchenko.modules
         End Function
         Private Function SelectCanonicalName(curItem As PrintedPoligonClass, layoutName As String, acEditor As Editor) As String
             Select Case curItem.Area
-                Case 62369 To 62371
+                Case 62360 To 62379
                     Return "ISO_full_bleed_A4_(" & curItem.XSize & ".00_x_" & curItem.YSize & ".00_MM)"
-                Case 124739 To 124741
+                Case 124730 To 124749
                     Return "ISO_full_bleed_A3_(" & curItem.XSize & ".00_x_" & curItem.YSize & ".00_MM)"
-                Case 249479 To 249481
+                Case 249470 To 249489
                     Return "ISO_full_bleed_A2_(" & curItem.XSize & ".00_x_" & curItem.YSize & ".00_MM)"
-                Case 499553 To 499555
+                Case 499546 To 499564
                     Return "ISO_full_bleed_A1_(" & curItem.XSize & ".00_x_" & curItem.YSize & ".00_MM)"
                 Case Else
                     Return "ISO_full_bleed_A4_(210.00_x_297.00_MM)"
