@@ -1,5 +1,4 @@
-﻿
-Imports System.Windows.Forms
+﻿Imports System.Windows.Forms
 Imports AutoCADVBNETLayoutCreator.com.vasilchenko.classes
 Imports Autodesk.AutoCAD
 Imports Autodesk.AutoCAD.DatabaseServices
@@ -38,12 +37,9 @@ Namespace com.vasilchenko.modules
                     acLayoutObjID = acLayoutMgr.CreateLayout("Layout" & intLayoutNumber)
                     acLayout = acTransaction.GetObject(acLayoutObjID, OpenMode.ForRead)
                     acLayoutMgr.CurrentLayout = acLayout.LayoutName
-
+                                    
                     'Apply plot settings to the provided layout
                     SetPlotSettings(acEditor, curItem, acLayout, acDatabase, dblOffset, acPrintedArea)
-
-                    Core.Application.SetSystemVariable("PSLTSCALE", 0)
-                    acEditor.Regen()
                     If blnTest Then
                         Dim acPrmtStrOptns As PromptStringOptions = New PromptStringOptions(vbCrLf & "Всё хорошо?" & vbCrLf _
                                                                                           & "Да(Д)/Yes(Y) - продолжаем печать" & vbCrLf _
@@ -63,6 +59,12 @@ Namespace com.vasilchenko.modules
                         End If
                         blnTest = False
                     End If
+                                      
+                    'Core.Application.SetSystemVariable("PSLTSCALE", 0)
+                    ApplicationServices.Application.AcadApplication.ActiveDocument.SendCommand("PSLTSCALE 0 " & vbCr)
+                    'ApplicationServices.Application.AcadApplication.ActiveDocument.SendCommand(vbCr)
+                    acEditor.Regen()
+
                     intLayoutNumber = intLayoutNumber + 1
                 Next
             Next
@@ -111,7 +113,7 @@ Namespace com.vasilchenko.modules
                 End If
 
                 ' устанавливаем стиль печати
-                'acPlotStgValidator.SetCurrentStyleSheet(acPlotStg, "acad.ctb")
+                acPlotStgValidator.SetCurrentStyleSheet(acPlotStg, "monochrome.ctb")
 
                 'Устанавливаем ориентацию
                 acPlotStgValidator.SetPlotRotation(acPlotStg, SelectPlotRotation(curItem))

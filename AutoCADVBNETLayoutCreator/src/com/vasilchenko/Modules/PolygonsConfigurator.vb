@@ -114,7 +114,7 @@ Namespace com.vasilchenko.modules
                                       Where key > acItem.BottonLeft.Y - 100 And key < acItem.BottonLeft.Y + 100
                                       Select key
                     If queryResult.Count = 0 Then
-                        Dim tempList = New SortedList(Of Double, PrintedPoligonClass)
+                        Dim tempList as New SortedList(Of Double, PrintedPoligonClass)
                         tempList.Add(acItem.BottonLeft.X, acItem)
                         acSortedPoligonList.Add(acItem.BottonLeft.Y, tempList)
                     Else
